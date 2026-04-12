@@ -1,0 +1,54 @@
+let
+    Source = Table1,
+    #"Added Custom" = Table.AddColumn(Source, "Past_Behaviour", each if [Payment_Date_Clean] = null and [Amount_Paid]>0 then "Data Issue"
+else if [Payment_Date_Clean]<> null and [Amount_Paid]=null then "Data Issue"
+else if  [Payment_Date_Clean]<> null and [Amount_Paid]=0 then "Data Issue"
+else if   [Payment_Date_Clean]= null and[Amount_Paid]=0 then "Unpaid"
+else if [Payment_Date_Clean]>[EMI_Due_Date] then "Late"
+else if [Payment_Date_Clean]<=[EMI_Due_Date] then "On Time"
+else "Check"),
+    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom",{{"Past_Behaviour", type text}}),
+    #"Added Custom2" = Table.AddColumn(#"Changed Type", "Delayed_Days", each let X = // CD
+#date(2024, 4, 29) meta [IsParameterQuery=true, Type="Date", IsParameterQueryRequired=true] 
+in 
+if [Payment_Date_Clean] = null and [Amount_Paid] >0 then null 
+else if [Payment_Date_Clean] <> null and [Amount_Paid] =0 then null
+else if [Payment_Date_Clean] = null then if X> [EMI_Due_Date] then X- [EMI_Due_Date] else 0 
+else if [Payment_Date_Clean]>[EMI_Due_Date] then [Payment_Date_Clean]-[EMI_Due_Date] 
+else 0),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Added Custom2",{{"Delayed_Days", Int64.Type}}),
+    #"Added Custom3" = Table.AddColumn(#"Changed Type2", "Aging_Bucket", each if [Delayed_Days] is  null then null
+else if [Delayed_Days] =0  then "On Time"
+else if [Delayed_Days] <=30 then"1-30 Days"
+else if [Delayed_Days] <= 60 then" 30- 60 Days"
+else if [Delayed_Days] <= 90 then "60-90 Days"
+else "90+ Days"),
+    #"Added Custom1" = Table.AddColumn(#"Added Custom3", "Payment_Status", each 
+let X = #date(2024, 4, 29)
+in
+if [Payment_Date_Clean] = null and [Amount_Paid] > 0 then "Data Issue"
+else if [Payment_Date_Clean] <> null and [Amount_Paid] =0 then "Data Issue"
+else if [Payment_Date_Clean] = null and [Amount_Paid] = 0 then
+    if [EMI_Due_Date] < X then "Overdue"
+    else if [EMI_Due_Date] = X then "Due Today"
+    else "Not Due Yet"
+
+else if [Payment_Date_Clean] > [EMI_Due_Date] then "Late Paid"
+
+else if [Payment_Date_Clean] <= [EMI_Due_Date] then "On Time"
+
+else "Check"
+),
+    #"Added Custom4" = Table.AddColumn(#"Added Custom1", "Custom", each if [Customer_Name_Flag] = "Valid" 
+    and [Loan_Amount_Flag] = "Valid" 
+    and [Branch_Flag] = "Valid" 
+    and [Payment_Date_Flag] = "Valid" 
+    then "Valid"
+    else "Invalid"),
+    #"Renamed Columns" = Table.RenameColumns(#"Added Custom4",{{"Custom", "Data Quality Flag"}}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns",{{"Data Quality Flag", type text}}),
+    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type1",{"Customer_ID", "Customer_Name_Clean", "Loan_ID", "Loan_Amount_Clean", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch_Clean", "Payment_Date_Clean", "EMI_Due_Date", "Amount_Paid", "Delayed_Days", "Aging_Bucket", "Payment_Status", "Data Quality Flag"}),
+    #"Replaced Value" = Table.ReplaceValue(#"Removed Other Columns",null,"Unknown",Replacer.ReplaceValue,{"Customer_Name_Clean"}),
+    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value",null,"Unknown",Replacer.ReplaceValue,{"Branch_Clean"})
+in
+    #"Replaced Value1"
