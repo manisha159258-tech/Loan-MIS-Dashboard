@@ -56,4 +56,4 @@ This project is licensed under the **MIT License** – free to use with attribut
 Watch the full demo here:  
 👉 [[Video Demo Link](https://your-demo-link.com)](https://canva.link/5kylmwoe111cgxx)  
 
-*(Replace with your actual YouTube/GitHub video link)*  
+
