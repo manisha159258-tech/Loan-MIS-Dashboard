@@ -1,0 +1,82 @@
+let
+    Source = Excel.CurrentWorkbook(){[Name="Table1"]}[Content],
+    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Customer_ID", type text}, {"Customer_Name", type text}, {"Loan_ID", type text}, {"Loan_Amount", type any}, {"EMI_Amount", Int64.Type}, {"Loan_Start_Date", type datetime}, {"Tenure_Months", Int64.Type}, {"Branch", type text}, {"Payment_Date", type any}, {"EMI_Due_Date", type datetime}, {"Amount_Paid", Int64.Type}}),
+    #"Added Custom" = Table.AddColumn(#"Changed Type", "Custom", each let CN = [Customer_Name]
+in 
+if CN = null or Text.Trim(CN)=null then null
+else if Text.Trim(CN)=Text.Select(Text.Trim(CN),{"A".."Z","a".."z"," "}) then Text.Trim(CN)
+else null),
+    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Custom.1", each let CN = [Customer_Name]
+in
+if CN = null or Text.Trim(CN) = "" then null
+else if Text.Trim(CN) = Text.Select(Text.Trim(CN), {"A".."Z","a".."z"," "}) then Text.Trim(CN)
+else null),
+    #"Removed Columns" = Table.RemoveColumns(#"Added Custom1",{"Custom.1"}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Removed Columns",{"Customer_ID", "Customer_Name", "Custom", "Loan_ID", "Loan_Amount", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch", "Payment_Date", "EMI_Due_Date", "Amount_Paid"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Reordered Columns",{{"Custom", "Customer_Name_Clean"}}),
+    #"Added Custom2" = Table.AddColumn(#"Renamed Columns", "Customer_Name_Flag", each if [Customer_Name_Clean] =null then "Missing / Invalid"
+else "Valid"),
+    #"Reordered Columns1" = Table.ReorderColumns(#"Added Custom2",{"Customer_ID", "Customer_Name", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch", "Payment_Date", "EMI_Due_Date", "Amount_Paid"}),
+    #"Added Custom3" = Table.AddColumn(#"Reordered Columns1", "Custom", each let  X = try Number.From ([Loan_Amount])
+in if X[HasError] then null else X[Value]),
+    #"Reordered Columns2" = Table.ReorderColumns(#"Added Custom3",{"Customer_ID", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount", "Custom", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch", "Payment_Date", "EMI_Due_Date", "Amount_Paid"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Reordered Columns2",{{"Custom", "Loan_Amount_Clean"}}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns1",{{"Customer_Name_Flag", type text}}),
+    #"Added Custom4" = Table.AddColumn(#"Changed Type1", "Loan_Amount_Flag", each if [Loan_Amount_Clean] =null then "Missing / Invalid"
+else "Valid"),
+    #"Reordered Columns3" = Table.ReorderColumns(#"Added Custom4",{"Customer_ID", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount", "Loan_Amount_Clean", "Loan_Amount_Flag", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch", "Payment_Date", "EMI_Due_Date", "Amount_Paid"}),
+    #"Changed Type with Locale" = Table.TransformColumnTypes(#"Reordered Columns3", {{"Loan_Start_Date", type date}}, "en-IN"),
+    #"Added Custom5" = Table.AddColumn(#"Changed Type with Locale", "Custom", each let X =[Branch]
+in 
+if X = null or Text.Trim (X) = "" then  null 
+else if Text.Trim (X) = Text.Select( Text.Trim (X) , {"A".."Z","a".."z"," "}) then Text.Trim (X) 
+else null),
+    #"Reordered Columns4" = Table.ReorderColumns(#"Added Custom5",{"Customer_ID", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount_Clean", "Loan_Amount_Flag", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch", "Custom", "Payment_Date", "EMI_Due_Date", "Amount_Paid"}),
+    #"Renamed Columns2" = Table.RenameColumns(#"Reordered Columns4",{{"Custom", "Branch_Clean"}}),
+    #"Added Custom6" = Table.AddColumn(#"Renamed Columns2", "Branch_Flag", each if [Branch_Clean] =  null then "Missing / Invalid" 
+else "Valid"),
+    #"Reordered Columns5" = Table.ReorderColumns(#"Added Custom6",{"Customer_ID", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount_Clean", "Loan_Amount_Flag", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch", "Branch_Clean", "Branch_Flag", "Payment_Date", "EMI_Due_Date", "Amount_Paid"}),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Reordered Columns5",{{"Branch_Clean", type text}}),
+    #"Added Custom7" = Table.AddColumn(#"Changed Type2", "Custom", each let X = try Date.From([Payment_Date])
+in
+if X [HasError] then null else X[Value]),
+    #"Reordered Columns6" = Table.ReorderColumns(#"Added Custom7",{"Customer_ID", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount_Clean", "Loan_Amount_Flag", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch_Clean", "Branch_Flag", "Payment_Date", "Custom", "EMI_Due_Date", "Amount_Paid"}),
+    #"Changed Type3" = Table.TransformColumnTypes(#"Reordered Columns6",{{"Branch_Flag", type text}}),
+    #"Added Custom8" = Table.AddColumn(#"Changed Type3", "Custom.1", each if [Custom]= null then "Missing / Invalid"
+else "Valid"),
+    #"Reordered Columns7" = Table.ReorderColumns(#"Added Custom8",{"Customer_ID", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount_Clean", "Loan_Amount_Flag", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch_Clean", "Branch_Flag", "Payment_Date", "Custom", "Custom.1", "EMI_Due_Date", "Amount_Paid"}),
+    #"Renamed Columns3" = Table.RenameColumns(#"Reordered Columns7",{{"Custom", "Payment_Date_Clean"}, {"Custom.1", "Payment_Date_Flag"}}),
+    #"Changed Type4" = Table.TransformColumnTypes(#"Renamed Columns3",{{"Payment_Date_Clean", type date}, {"Payment_Date_Flag", type text}}),
+    #"Changed Type5" = Table.TransformColumnTypes(#"Changed Type4",{{"EMI_Due_Date", type date}}),
+    #"Added Custom9" = Table.AddColumn(#"Changed Type5", "Custom", each if [Amount_Paid]= 0 and Current>[EMI_Due_Date] then "Overdue"
+else if Current<[EMI_Due_Date] then "Not Due Yet"
+else if [Payment_Date_Clean] = null and [Amount_Paid] >0 then "Data Issue"
+else if [Payment_Date_Clean]>[EMI_Due_Date] and [Amount_Paid] >0 then "late"
+else if [Payment_Date_Clean]<[EMI_Due_Date] and [Amount_Paid]>0 then "On Time"
+else "Check"),
+    #"Renamed Columns4" = Table.RenameColumns(#"Added Custom9",{{"Custom", "Payment_Satus"}}),
+    #"Changed Type6" = Table.TransformColumnTypes(#"Renamed Columns4",{{"Payment_Satus", type text}}),
+    #"Added Custom10" = Table.AddColumn(#"Changed Type6", "Custom", each if [Loan_Amount] = null then  "Missing"
+else if [Loan_Amount_Clean]= null then "Invalid"
+else "Valid"),
+    #"Reordered Columns8" = Table.ReorderColumns(#"Added Custom10",{"Customer_ID", "Customer_Name", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount", "Loan_Amount_Clean", "Custom", "Loan_Amount_Flag", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch_Clean", "Branch_Flag", "Payment_Date_Clean", "Payment_Date_Flag", "EMI_Due_Date", "Amount_Paid", "Payment_Satus"}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Reordered Columns8",{"Loan_Amount_Flag"}),
+    #"Renamed Columns5" = Table.RenameColumns(#"Removed Columns1",{{"Custom", "Loan_Amount_Flag"}}),
+    #"Removed Columns2" = Table.RemoveColumns(#"Renamed Columns5",{"Customer_Name_Flag"}),
+    #"Added Custom11" = Table.AddColumn(#"Removed Columns2", "Customer_Name_Flag", each if [Customer_Name] = null then "Missing "
+else if [Customer_Name_Clean] = null then "Invalid"
+else "Valid"),
+    #"Reordered Columns9" = Table.ReorderColumns(#"Added Custom11",{"Customer_ID", "Customer_Name", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount", "Loan_Amount_Clean", "Loan_Amount_Flag", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Branch_Clean", "Branch_Flag", "Payment_Date_Clean", "Payment_Date_Flag", "EMI_Due_Date", "Amount_Paid", "Payment_Satus"}),
+    #"Removed Columns3" = Table.RemoveColumns(#"Reordered Columns9",{"Branch_Flag"}),
+    #"Added Custom12" = Table.AddColumn(#"Removed Columns3", "Branch_Flag", each if [Branch] = null then "Missing"
+else if [Branch_Clean] = null then "Invalid"
+else "Valid"),
+    #"Reordered Columns10" = Table.ReorderColumns(#"Added Custom12",{"Customer_ID", "Customer_Name", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount", "Loan_Amount_Clean", "Loan_Amount_Flag", "EMI_Amount", "Branch", "Loan_Start_Date", "Tenure_Months", "Payment_Date", "Branch_Clean", "Branch_Flag", "Payment_Date_Clean", "Payment_Date_Flag", "EMI_Due_Date", "Amount_Paid", "Payment_Satus"}),
+    #"Removed Columns4" = Table.RemoveColumns(#"Reordered Columns10",{"Customer_Name", "Loan_Amount", "Branch", "Payment_Date_Flag"}),
+    #"Added Custom13" = Table.AddColumn(#"Removed Columns4", "Payment_Date_Flag", each if [Payment_Date]= null then "Missing"
+else if [Payment_Date_Clean] = null then "Invalid"
+else "Valid"),
+    #"Reordered Columns11" = Table.ReorderColumns(#"Added Custom13",{"Customer_ID", "Customer_Name_Clean", "Customer_Name_Flag", "Loan_ID", "Loan_Amount_Clean", "Loan_Amount_Flag", "EMI_Amount", "Loan_Start_Date", "Tenure_Months", "Payment_Date", "Branch_Clean", "Branch_Flag", "Payment_Date_Clean", "Payment_Date_Flag", "EMI_Due_Date", "Amount_Paid", "Payment_Satus"}),
+    #"Removed Columns5" = Table.RemoveColumns(#"Reordered Columns11",{"Payment_Date", "Payment_Satus"})
+in
+    #"Removed Columns5"
