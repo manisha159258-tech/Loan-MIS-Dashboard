@@ -5,6 +5,7 @@ This project is an **interactive MIS dashboard** designed for loan recovery and 
 It demonstrates how clean, reliable data can drive confident business decisions.  
 
 The dashboard was built with **Power BI, Excel, and Power Query**, and showcases both **data quality remediation** and **business KPI reporting**.
+<img width="1442" height="925" alt="image" src="https://github.com/user-attachments/assets/ed73a640-92a7-4068-9fb4-8fb530a9f190" />
 
 ---
 
