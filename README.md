@@ -1,60 +1,61 @@
 # Loan MIS Dashboard
 
 ## 📌 Overview
-This project is an **interactive MIS dashboard** designed for loan recovery and delinquency monitoring.  
-It demonstrates how clean, reliable data can drive confident business decisions.  
+Interactive MIS dashboard for loan recovery and delinquency monitoring.  
+Demonstrates how clean data and KPI-driven reporting can support better business decisions.
 
-The dashboard was built with **Power BI, Excel, and Power Query**, and showcases both **data quality remediation** and **business KPI reporting**.
-<img width="1442" height="925" alt="image" src="https://github.com/user-attachments/assets/ed73a640-92a7-4068-9fb4-8fb530a9f190" />
+Built using **Power BI, Excel, and Power Query**, focusing on both **data quality remediation** and **business performance tracking**.
 
 ---
 
 ## 🚀 Features
-- **KPI Tracking**: Loan Amount, Collection, Outstanding, Avg Delay (Days), Payment Rate (%)  
-- **Branch-Level Drill-Down**: Compare performance across branches  
-- **Risk Buckets**: Track delinquency categories for early recovery actions  
-- **Data Quality Flags**: Transparent issue identification before reporting  
-- **Automation**: Reduced manual effort through Power Query transformations  
+- KPI Tracking: Loan Amount, Collection, Outstanding, Avg Delay (Days), Payment Rate (%)  
+- Branch-Level Analysis: Compare performance across branches  
+- Risk Segmentation: Delinquency tracking for early recovery actions  
+- Data Quality Flags: Identify and track data issues before reporting  
+- Automated Data Cleaning: Power Query-based transformations  
 
 ---
 
 ## 🛠 Tech Stack
-- **Power BI** – Dashboard design & visualization  
-- **Excel** – Data preparation & reporting  
-- **Power Query (M Code)** – Data cleaning, validation, and transformation  
-- **SQL (Basics)** – Query fundamentals for structured datasets  
+- Power BI – Dashboard development & visualization  
+- Excel – Data preparation & reporting  
+- Power Query (M Code) – Data cleaning & transformation  
+- SQL (Basic) – Query fundamentals  
 
 ---
 
-## 📂 Repository Files
-- **Loan Recovery & MIS Dashboard (Power BI)** → Main dashboard file (`.pbix`)  
-- **Loan MIS Dashboard – PDF Snapshot** → Static report for recruiters without Power BI  
-- **data_quality_proof_m_code.txt** → Raw → Clean → Flag logic (data quality remediation)  
-- **business_logic_proof_m_code.txt** → KPI calculations (Payment Status, Delayed Days, etc.)  
-
----
-
-## 📊 Data Quality Proof
-- Identified and resolved **300+ issues (~55% error rate)** in a dataset of 500 records  
+## 📊 Key Impact (Data Quality)
+- Identified and resolved **300+ data issues (~55% of dataset)**  
 - Applied validation, cleaning, and standardization techniques  
-- Reduced issue rate to **near zero**, ensuring reliable reporting  
+- Reduced errors to near zero for reliable reporting  
 
 ---
 
-## 📈 Business Logic Proof
-- Created calculated fields for **Payment Status** and **Delayed Days**  
-- Enabled KPI-driven monitoring for loan recovery performance  
+## 📈 Business Logic
+- Created calculated fields for Payment Status and Delayed Days  
+- Enabled KPI-based monitoring of loan performance  
 - Supported branch-level decision-making with actionable insights  
 
 ---
 
+## 📂 Repository Files
+- `.pbix` – Main Power BI dashboard  
+- PDF Snapshot – Static report for recruiters  
+- `data_quality_proof_m_code.txt` – Cleaning & validation logic  
+- `business_logic_proof_m_code.txt` – KPI calculations  
+
+---
+
+## 📸 Dashboard Preview
+<img width="1442" height="925" alt="dashboard" src="https://github.com/user-attachments/assets/ed73a640-92a7-4068-9fb4-8fb530a9f190" />
+
+---
+
 ## 📜 License
-This project is licensed under the **MIT License** – free to use with attribution.  
+MIT License – free to use with attribution.
 
 ---
 
 ## 🎥 Video Demo
-Watch the full demo here:  
-👉 [[Video Demo Link](https://your-demo-link.com)](https://canva.link/5kylmwoe111cgxx)  
-
-
+👉 https://canva.link/5kylmwoe111cgxx
